@@ -8,6 +8,11 @@ import re
 import subprocess
 
 for a in sys.argv:
+  if not os.path.isdir(a):
+    print("{} is not a directory".format(a))
+    sys.exit(1)
+
+for a in sys.argv:
   for dirName, subdirList, fileList in os.walk(a, topdown=False):
     if '.AppleDouble' in dirName:
       continue
