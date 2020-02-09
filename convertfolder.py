@@ -7,10 +7,12 @@ import getopt
 import re
 import subprocess
 
-for a in sys.argv:
+for a in sys.argv[1:]:
   if not os.path.isdir(a):
     print("{} is not a directory".format(a))
     sys.exit(1)
+
+pid = str(os.getpid())
 
 for a in sys.argv:
   for dirName, subdirList, fileList in os.walk(a, topdown=False):
@@ -23,6 +25,9 @@ for a in sys.argv:
     if '@eaDir' in dirName:
       continue
     for f in fileList:
+      if f.lower().startswith('deleteme-'):
+        print("Skipping {} because already processed".format(f))
+        continue
       if f.lower().endswith('.mp4'):
         print("Skipping {} because no point in messing with mp4's".format(f))
         continue
@@ -63,9 +68,10 @@ for a in sys.argv:
       result = subprocess.run([ '/usr/local/bin/ffmpeg',
                        '-i',
                        os.path.join(dirName,f),
-                       os.path.join(dirName,nf) ])
+                       os.path.join(dirName,nf) ], capture_output=True)
       if result.returncode:
-        print("ffmpeg -i {} {} appears to have failed".format(f,nf))
+        os.rename(os.path.join(dirName,nf),os.path.join(dirName,"failed-" + pid + "-" + nf))
+        print("ffmpeg -i {} {} appears to have failed:\n===stdout\n{}\n===stderr{}\n===".format(f,nf,result.stdout.decode('utf-8'),result.stderr.decode('utf-8')))
       else:
         os.rename(os.path.join(dirName,f),os.path.join(dirName,"deleteme-" + f))
         os.utime(os.path.join(dirName,nf), times=(stat.st_mtime, stat.st_mtime))
