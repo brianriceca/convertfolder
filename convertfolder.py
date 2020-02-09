@@ -71,7 +71,7 @@ for a in sys.argv:
                        os.path.join(dirName,nf) ], capture_output=True)
       if result.returncode:
         os.rename(os.path.join(dirName,nf),os.path.join(dirName,"failed-" + pid + "-" + nf))
-        print("ffmpeg -i {} {} appears to have failed:\n===stdout\n{}\n===stderr{}\n===".format(f,nf,result.stdout.decode('utf-8'),result.stderr.decode('utf-8')))
+        print("ffmpeg -i {} {} appears to have failed:\n===stdout\n{}\n===stderr\n{}\n===".format(f,nf,result.stdout.decode('utf-8'),result.stderr.decode('utf-8')))
       else:
         os.rename(os.path.join(dirName,f),os.path.join(dirName,"deleteme-" + f))
         os.utime(os.path.join(dirName,nf), times=(stat.st_mtime, stat.st_mtime))
